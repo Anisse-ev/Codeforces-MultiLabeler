@@ -3,17 +3,18 @@ import os
 import re
 import pandas as pd
 import datetime
-
+from typing import List
 from config.links_and_paths import RAW_DATA_DIR, CLEAN_DATA_DIR
+
 from config.data_config import (COLUMNS_RENAMING,
-                                    SELECTED_COLUMNS,
-                                    SELECTED_TAGS,
-                                    MINIMUM_TAGS,
-                                    COLUMNS_TO_LOWERCASE,
-                                    CREATION_TIME_COLUMN)
+                                SELECTED_COLUMNS,
+                                SELECTED_TAGS,
+                                MINIMUM_TAGS,
+                                COLUMNS_TO_LOWERCASE,
+                                CREATION_TIME_COLUMN)
 
 
-def _parse_time_limit(time_str):
+def _parse_time_limit(time_str: str) -> float:
     """
     Convert a time limit string (e.g., "1 second") to a float in seconds.
     Handles cases like "2 seconds", "1.5 sec", etc.
@@ -25,7 +26,7 @@ def _parse_time_limit(time_str):
         return float(match.group(1))
     return None
 
-def _parse_memory_limit(mem_str):
+def _parse_memory_limit(mem_str: str) -> float:
     """
     Convert a memory limit string (e.g., "256 megabytes") to a float in MB.
     Handles cases like "1024 MB", "512 megabytes", etc.
@@ -37,7 +38,7 @@ def _parse_memory_limit(mem_str):
         return float(match.group(1))
     return None
 
-def _process_json_file(file_path):
+def _process_json_file(file_path: str) -> pd.DataFrame:
     """
     Load a JSON file and return a DataFrame. Returns an empty DataFrame on failure.
     """
@@ -49,7 +50,7 @@ def _process_json_file(file_path):
         print(f"Error loading {file_path}: {e}")
         return pd.DataFrame()
 
-def _load_raw_data(raw_dir):
+def _load_raw_data(raw_dir: str) -> pd.DataFrame:
     """
     Load and concatenate all JSON files found in raw_dir.
     """
@@ -68,7 +69,7 @@ def _load_raw_data(raw_dir):
     return combined_data
     
 
-def clean_data(raw_dir, output_dir):
+def clean_data(raw_dir: str, output_dir: str) -> None:
     # Load data from all JSON files in the provided raw directory
     codeforce_df = _load_raw_data(raw_dir)
     
@@ -153,4 +154,3 @@ def clean_data(raw_dir, output_dir):
 
 if __name__ == "__main__":
     clean_data(RAW_DATA_DIR, CLEAN_DATA_DIR)
-

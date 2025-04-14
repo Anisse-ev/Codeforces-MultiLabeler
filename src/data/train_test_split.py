@@ -1,10 +1,11 @@
 import pandas as pd
 import os
 import argparse
+from typing import List, Tuple
 from config.links_and_paths import TRAIN_TEST_DATA_FILE_NAMES, TRAIN_SPLIT_DATA_DIR, CLEAN_DATA_DIR
 from config.data_config import SELECTED_TAGS, TEST_SET_SIZE
 
-def get_latest_csv(directory):
+def get_latest_csv(directory: str) -> str:
     """
     Returns the latest CSV file in the given directory.
     """
@@ -14,7 +15,7 @@ def get_latest_csv(directory):
     latest_file = max(csv_files, key=os.path.getctime)
     return latest_file
 
-def analyze_train_test_split(csv_path, test_proportion):
+def analyze_train_test_split(csv_path: str, test_proportion: float) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Split the dataset chronologically by creation_order and analyze tag distribution.
     

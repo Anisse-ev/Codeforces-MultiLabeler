@@ -3,8 +3,9 @@ import gdown
 import zipfile
 import shutil
 from config.links_and_paths import RAW_DATA_LINK, RAW_DATA_DIR
+from typing import Any, List
 
-def download_and_extract_json_files(raw_data_link, raw_data_dir):
+def download_and_extract_json_files(raw_data_link: str, raw_data_dir: str) -> None:
     # Extract parent directory and target folder name
     parent_dir = os.path.dirname(raw_data_dir)
 
@@ -51,6 +52,4 @@ def download_and_extract_json_files(raw_data_link, raw_data_dir):
     print(f"Extracted and renamed to: {raw_data_dir}")
 
 if __name__ == "__main__":
-    
-    # Call the function to import data
     download_and_extract_json_files(RAW_DATA_LINK, RAW_DATA_DIR)
