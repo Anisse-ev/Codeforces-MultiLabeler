@@ -4,12 +4,12 @@ import zipfile
 import shutil
 from config.links_and_paths import RAW_DATA_LINK, RAW_DATA_DIR
 
-def download_and_extract_json_files(RAW_DATA_LINK, RAW_DATA_DIR):
+def download_and_extract_json_files(raw_data_link, raw_data_dir):
     # Extract parent directory and target folder name
-    parent_dir = os.path.dirname(RAW_DATA_DIR)
+    parent_dir = os.path.dirname(raw_data_dir)
 
     # Get the file ID from the Google Drive link
-    file_id = RAW_DATA_LINK.split('/d/')[1].split('/')[0]
+    file_id = raw_data_link.split('/d/')[1].split('/')[0]
     file_url = f'https://drive.google.com/uc?export=download&id={file_id}'
 
     # Create a temporary path to download and extract the zip
@@ -17,9 +17,9 @@ def download_and_extract_json_files(RAW_DATA_LINK, RAW_DATA_DIR):
     tmp_extract_path = os.path.join(parent_dir, 'temp_extracted')
 
     # Clean previous target directory if exists
-    if os.path.exists(RAW_DATA_DIR):
-        shutil.rmtree(RAW_DATA_DIR)
-        print(f"Removed existing directory: {RAW_DATA_DIR}")
+    if os.path.exists(raw_data_dir):
+        shutil.rmtree(raw_data_dir)
+        print(f"Removed existing directory: {raw_data_dir}")
 
     # Clean any previous temp
     if os.path.exists(tmp_extract_path):
@@ -44,11 +44,11 @@ def download_and_extract_json_files(RAW_DATA_LINK, RAW_DATA_DIR):
     assert len(extracted_items) == 1, "Expected only one folder inside the zip."
     extracted_folder_path = os.path.join(tmp_extract_path, extracted_items[0])
 
-    # Move and rename it to the target RAW_DATA_DIR
-    shutil.move(extracted_folder_path, RAW_DATA_DIR)
+    # Move and rename it to the target raw_data_dir
+    shutil.move(extracted_folder_path, raw_data_dir)
     shutil.rmtree(tmp_extract_path)
 
-    print(f"Extracted and renamed to: {RAW_DATA_DIR}")
+    print(f"Extracted and renamed to: {raw_data_dir}")
 
 if __name__ == "__main__":
     
