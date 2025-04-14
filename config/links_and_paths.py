@@ -1,0 +1,5 @@
+RAW_DATA_LINK = "https://drive.google.com/file/d/1FyNPiEKkZBfhz4ua0eM3PQjbRWVwO95J/view"
+RAW_DATA_DIR = "data/raw_data"
+PRE_PROCESSED_DATA_DIR = "data/preprocessed_data/codeforces_preprocessed_data.csv"
+TRAIN_SPLIT_DATA_DIR = "data/train_test_split"
+TRAINED_MODELS_DIR = "models/trained_models"
