@@ -14,13 +14,13 @@ Data source: `codeforces_clean_data_2025-04-17.csv`
 
 This heatmap shows how often pairs of tags appear together in the dataset (raw counts).
 
-![Tag Co-occurrence Heatmap](tag_cooccurrence_heatmap.png)
+![Tag Co-occurrence Heatmap](visualizations/tag_cooccurrence_heatmap.png)
 
 ### Distribution of Active Tags per Problem
 
 This plot shows the percentage of problems having a specific number of assigned tags.
 
-![Tag Count Distribution](tag_count_distribution.png)
+![Tag Count Distribution](visualizations/tag_count_distribution.png)
 
 * Average number of tags per problem: `0.68`
 
@@ -30,13 +30,13 @@ This plot shows the percentage of problems having a specific number of assigned 
 
 Correlation between `time_limit, memory_limit, difficulty_rating`.
 
-![Numerical Feature Correlation](numerical_correlation.png)
+![Numerical Feature Correlation](visualizations/numerical_correlation.png)
 
 ### Correlation between Numerical Features and Tags
 
 Correlation between numerical features and the presence of specific tags. Note: Correlation with binary (0/1) tags indicates association strength.
 
-![Numerical vs Tag Correlation](numerical_tag_correlation.png)
+![Numerical vs Tag Correlation](visualizations/numerical_tag_correlation.png)
 
 ## 4. Text Feature Analysis
 
