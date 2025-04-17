@@ -38,4 +38,4 @@ FINE_TUNED_LORA_WEIGHTS_DIR = os.path.join(FINE_TUNED_MODEL_DIR, "lora_weights")
 FINE_TUNED_PREDICTIONS_DIR = os.path.join(FINE_TUNED_MODEL_DIR, "predictions")
 
 # --- Model Names ---
-BASE_MODEL_NAME = "Qwen/Qwen2.5-7B-Instruct"
+BASE_MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"
