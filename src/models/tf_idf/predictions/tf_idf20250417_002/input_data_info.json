@@ -1,0 +1,8 @@
+{
+    "input_csv_path": "/Users/anisseid-benaddi/Desktop/GIT/Codeforces-MultiLabeler/data/train_test_split/codeforces_test_data.csv",
+    "tf_idf_path_used": "/Users/anisseid-benaddi/Desktop/GIT/Codeforces-MultiLabeler/src/models/tf_idf/saved_model/tf_idf_20250417_001",
+    "prediction_timestamp": "2025-04-17T13:16:40.956325",
+    "total_examples_predicted": 1246,
+    "sampled_data": false,
+    "sample_size": "all"
+}

@@ -1,0 +1,40 @@
+{
+    "timestamp": "2025-04-17T14:30:12.548046",
+    "training_data_path": "/Users/anisseid-benaddi/Desktop/GIT/Codeforces-MultiLabeler/data/train_test_split/codeforces_train_data.csv",
+    "subset_size_used": "all",
+    "text_feature_used": "problem_description",
+    "numerical_features_used": [
+        "time_limit",
+        "memory_limit",
+        "difficulty_rating"
+    ],
+    "tfidf_params": {
+        "max_df": 0.8,
+        "min_df": 5,
+        "max_features": 5000,
+        "ngram_range": [
+            1,
+            2
+        ],
+        "stop_words": "english"
+    },
+    "rf_params": {
+        "n_estimators": 200,
+        "max_depth": 10,
+        "random_state": 42,
+        "n_jobs": -1
+    },
+    "sampling_method": "RandomUnderSampler",
+    "tags_trained": [
+        "math",
+        "graphs",
+        "strings",
+        "number theory",
+        "trees",
+        "geometry",
+        "games",
+        "probabilities"
+    ],
+    "preprocessor_path": "preprocessor.joblib",
+    "models_path": "models.joblib"
+}

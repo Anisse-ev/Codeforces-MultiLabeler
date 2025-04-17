@@ -1,0 +1,49 @@
+{
+    "input_csv_path": "/Users/anisseid-benaddi/Desktop/GIT/Codeforces-MultiLabeler/data/train_test_split/codeforces_test_data.csv",
+    "model_type": "TF-IDF + RandomForest (Numerical Features + Undersampling)",
+    "model_loaded_from_dir": "/Users/anisseid-benaddi/Desktop/GIT/Codeforces-MultiLabeler/src/models/tf_idf/saved_model/tfidf_rf_sampled_20250417_001",
+    "training_params_loaded": {
+        "timestamp": "2025-04-17T13:45:26.170162",
+        "training_data_path": "/Users/anisseid-benaddi/Desktop/GIT/Codeforces-MultiLabeler/data/train_test_split/codeforces_train_data.csv",
+        "subset_size_used": "all",
+        "text_feature_used": "problem_description",
+        "numerical_features_used": [
+            "time_limit",
+            "memory_limit",
+            "difficulty_rating"
+        ],
+        "tfidf_params": {
+            "max_df": 0.8,
+            "min_df": 5,
+            "max_features": 5000,
+            "ngram_range": [
+                1,
+                2
+            ],
+            "stop_words": "english"
+        },
+        "rf_params": {
+            "n_estimators": 200,
+            "max_depth": 10,
+            "random_state": 42,
+            "n_jobs": -1
+        },
+        "sampling_method": "RandomUnderSampler",
+        "tags_trained": [
+            "math",
+            "graphs",
+            "strings",
+            "number theory",
+            "trees",
+            "geometry",
+            "games",
+            "probabilities"
+        ],
+        "preprocessor_path": "preprocessor.joblib",
+        "models_path": "models.joblib"
+    },
+    "prediction_timestamp": "2025-04-17T13:46:15.579824",
+    "total_examples_predicted": 1246,
+    "sampled_data_input": false,
+    "sample_size": "all"
+}

@@ -27,6 +27,11 @@ ZERO_SHOT_DATA_CSV = os.path.join(TRAIN_TEST_SPLIT_DIR, "codeforces_zero_shot_da
 SRC_DIR = os.path.join(PROJECT_ROOT, "src")
 MODELS_DIR = os.path.join(SRC_DIR, "models")
 
+# --- tf-idf Model ---
+TF_IDF_MODEL_DIR = os.path.join(MODELS_DIR, "tf_idf")
+TF_IDF_SAVED_MODEL_PATH = os.path.join(TF_IDF_MODEL_DIR, "saved_model")
+TF_IDF_PREDICTIONS_DIR = os.path.join(TF_IDF_MODEL_DIR, "predictions")
+
 # --- Zero-Shot Model ---
 ZERO_SHOT_MODEL_DIR = os.path.join(MODELS_DIR, "zero_shot_Qwen2_5")
 ZERO_SHOT_SAVED_MODEL_PATH = os.path.join(ZERO_SHOT_MODEL_DIR, "saved_model") # Directory to save the base model
