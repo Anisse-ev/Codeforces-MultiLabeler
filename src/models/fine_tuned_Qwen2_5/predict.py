@@ -58,8 +58,6 @@ def load_fine_tuned_model(lora_adapter_path: str, hf_token: str | None = None):
         **base_load_kwargs
     )
 
-    # Load tokenizer associated with the adapter
-    # Pass token here too, in case tokenizer files need remote access/verification
     tokenizer_load_kwargs = {"token": hf_token} if hf_token else {}
     tokenizer = AutoTokenizer.from_pretrained(lora_adapter_path, **tokenizer_load_kwargs)
 

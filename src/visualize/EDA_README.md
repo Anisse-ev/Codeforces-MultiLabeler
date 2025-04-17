@@ -1,12 +1,12 @@
 # Data Analysis Report for Cleaned Codeforces Data
 
-Analysis performed on: `2025-04-17 09:01:54`
+Analysis performed on: `2025-04-17 09:40:08`
 Data source: `codeforces_clean_data_2025-04-17.csv`
 
 ## 1. Basic Statistics
 
 * Total problems analyzed: `4982`
-* Columns included in analysis: `trees, geometry, solution_code, input_specification, problem_description, problem_notes, difficulty_rating, strings, output_specification, time_limit, memory_limit, probabilities, sample_inputs, math, graphs, execution_result, games, number theory, sample_outputs`
+* Columns included in analysis: `probabilities, time_limit, graphs, trees, output_specification, execution_result, input_specification, strings, sample_outputs, memory_limit, solution_code, problem_description, number theory, difficulty_rating, math, problem_notes, games, geometry, sample_inputs`
 
 ## 2. Tag Analysis
 

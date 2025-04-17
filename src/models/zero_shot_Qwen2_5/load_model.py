@@ -19,22 +19,20 @@ def load_base_model(hf_token: str | None = None, force_redownload=False):
     model_path = ZERO_SHOT_SAVED_MODEL_PATH
     model_exists = os.path.exists(os.path.join(model_path, "config.json")) # Basic check
 
-    # Prepare arguments for from_pretrained, adding token only if provided
     load_kwargs = {
-        "torch_dtype": torch.float16, # Adjust dtype based on available hardware
-        "device_map": 'auto' # Automatically distribute across available GPUs/CPU
+        "torch_dtype": torch.float16, 
+        "device_map": 'auto' 
     }
     if hf_token:
         load_kwargs["token"] = hf_token
 
     if model_exists and not force_redownload:
         print(f"Loading base model from local path: {model_path}")
-        # No token needed usually when loading locally, unless files are just pointers
         model = AutoModelForCausalLM.from_pretrained(
             model_path,
             torch_dtype=load_kwargs["torch_dtype"],
             device_map=load_kwargs["device_map"],
-            local_files_only=True # Try loading only local files first
+            local_files_only=True 
         )
         tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True)
     else:
@@ -60,7 +58,7 @@ def load_base_model(hf_token: str | None = None, force_redownload=False):
         print("Model and tokenizer saved successfully.")
 
     print(f"Base model '{BASE_MODEL_NAME}' loaded successfully.")
-    print(f"Model is on device: {model.device}") # Verify device placement
+    print(f"Model is on device: {model.device}")
     return model, tokenizer
 
 if __name__ == "__main__":

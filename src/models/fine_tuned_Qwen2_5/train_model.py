@@ -1,18 +1,14 @@
-# src/models/fine_tuned_Qwen2_5/train_model.py
 import argparse
 import os
 import json
 import pandas as pd
-import torch
 from datetime import datetime
 
-# Third-party Libraries
 from datasets import Dataset, load_dataset
-from transformers import TrainingArguments, AutoTokenizer
+from transformers import TrainingArguments
 from unsloth import FastLanguageModel, is_bfloat16_supported
 from trl import SFTTrainer
 
-# Project Imports
 from config.links_and_paths import (
     TRAIN_DATA_CSV, ZERO_SHOT_SAVED_MODEL_PATH,
     FINE_TUNED_LORA_WEIGHTS_DIR, BASE_MODEL_NAME
@@ -134,9 +130,6 @@ def main(args):
     # --- 7. Save LoRA Weights and Config ---
     print("Saving LoRA adapter weights...")
 
-    # *** Use the utility function to get the save path ***
-    # This will create and return a directory path like:
-    # .../lora_weights/lora_adapter_YYYYMMDD_001/
     lora_save_path = get_incremental_directory_path(
         base_dir=FINE_TUNED_LORA_WEIGHTS_DIR,
         prefix="lora_adapter_" # This prefix will come before the date
@@ -203,14 +196,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Basic validation for steps/epochs
     if args.max_steps is not None and args.max_steps <= 0:
         args.max_steps = None # Treat 0 or negative as unset
     if args.num_epochs is not None and args.num_epochs <= 0:
         args.num_epochs = None # Treat 0 or negative as unset
     if args.max_steps is None and args.num_epochs is None:
         print("Warning: Neither --max_steps (>0) nor --num_epochs (>0) provided. Using defaults from config.")
-        # Rely on TRAINING_ARGS_CONFIG defaults
 
 
     main(args)

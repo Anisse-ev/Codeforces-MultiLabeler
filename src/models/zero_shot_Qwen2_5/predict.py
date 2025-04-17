@@ -7,7 +7,6 @@ from tqdm import tqdm
 import numpy as np
 from datetime import datetime # Added for timestamp
 
-# Project imports
 from config.links_and_paths import (
     TEST_DATA_CSV, ZERO_SHOT_PREDICTIONS_DIR, ZERO_SHOT_SAVED_MODEL_PATH,
     BASE_MODEL_NAME # Added for info json

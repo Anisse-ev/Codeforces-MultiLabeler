@@ -9,12 +9,12 @@ import warnings
 
 # Attempt to import config, handle if running script directly vs as module
 try:
-    from config.links_and_paths import CLEAN_DATA_DIR
+    # Assumes the script is run from the project root or PYTHONPATH is set
+    from config.links_and_paths import CLEAN_DATA_DIR # Not strictly needed if path is argument
     from config.data_config import SELECTED_TAGS, OTHER_FEATURE_COLUMNS
 except ModuleNotFoundError:
     print("Warning: Could not import from config files. Defining defaults locally.")
     # Define fallbacks if run standalone - adjust paths as needed
-    CLEAN_DATA_DIR = "../../data/clean_data" # Example relative path
     SELECTED_TAGS = [
         'math', 'graphs', 'strings', 'number theory', 'trees',
         'geometry', 'games', 'probabilities'
@@ -46,14 +46,13 @@ TEXT_COLUMNS_FOR_ANALYSIS = [
 # Ensure text columns are actually in SELECTED_COLUMNS
 TEXT_COLUMNS_FOR_ANALYSIS = [col for col in TEXT_COLUMNS_FOR_ANALYSIS if col in SELECTED_COLUMNS]
 
+# --- Plotting Functions ---
 
 def generate_tag_heatmap(df, tags, output_path):
     """Generates and saves a heatmap of tag co-occurrences."""
     print("Generating tag co-occurrence heatmap...")
     tag_data = df[tags].fillna(0).astype(int)
     cooccurrence_matrix = tag_data.T.dot(tag_data)
-    # Normalize by diagonal to get conditional probability? Optional.
-    # Or just show raw counts. Let's show raw counts.
     plt.figure(figsize=(10, 8))
     sns.heatmap(cooccurrence_matrix, annot=True, fmt="d", cmap="viridis")
     plt.title("Tag Co-occurrence Counts")
@@ -76,7 +75,6 @@ def plot_tag_distribution(df, tags, output_path):
     plt.title("Distribution of Number of Active Tags per Problem")
     plt.xlabel("Number of Active Tags")
     plt.ylabel("Percentage of Problems (%)")
-    # Add percentage labels on top of bars
     for container in ax.containers:
         ax.bar_label(container, fmt='%.1f%%')
     plt.tight_layout()
@@ -88,9 +86,7 @@ def plot_tag_distribution(df, tags, output_path):
 def generate_correlation_heatmap(df, columns, title, output_path):
     """Generates and saves a correlation heatmap for specified columns."""
     print(f"Generating correlation heatmap: {title}...")
-    # Convert relevant columns to numeric, coercing errors
     numeric_df = df[columns].apply(pd.to_numeric, errors='coerce')
-    # Drop columns that couldn't be converted entirely (all NaN)
     numeric_df = numeric_df.dropna(axis=1, how='all')
     if numeric_df.empty:
          print(f"Warning: No valid numeric data found for columns: {columns}. Skipping heatmap.")
@@ -106,27 +102,23 @@ def generate_correlation_heatmap(df, columns, title, output_path):
     plt.close()
     print(f"Correlation heatmap saved to {output_path}")
 
+# --- Text Analysis Function ---
+
 def calculate_text_stats(df, text_columns):
     """Calculates missing percentage and average length for text columns."""
     print("Calculating text column statistics...")
     stats = {}
     total_rows = len(df)
-    if total_rows == 0:
-        return {}
+    if total_rows == 0: return {}
 
     for col in text_columns:
         if col not in df.columns:
             print(f"Warning: Text column '{col}' not found in DataFrame. Skipping.")
             continue
-        # Calculate missing/empty percentage
-        # Treat None, NaN, and empty strings as missing/empty
         missing_empty_count = df[col].isna().sum() + (df[col] == '').sum()
         missing_perc = (missing_empty_count / total_rows) * 100
-
-        # Calculate average length of non-empty strings
         non_empty_lengths = df.loc[df[col].notna() & (df[col] != ''), col].astype(str).str.len()
         avg_len = non_empty_lengths.mean() if not non_empty_lengths.empty else 0
-
         stats[col] = {
             "missing_perc": round(missing_perc, 2),
             "avg_len": round(avg_len, 2)
@@ -134,9 +126,17 @@ def calculate_text_stats(df, text_columns):
     print("Text stats calculated.")
     return stats
 
-def generate_readme(stats, output_dir, input_csv_path):
+# --- README Generation Function ---
+
+def generate_readme(stats, readme_path, viz_subdir_name, input_csv_path):
     """Generates the README.md file content."""
     print("Generating README content...")
+    # Use relative paths for images within the README
+    tag_heatmap_relpath = f"{viz_subdir_name}/tag_cooccurrence_heatmap.png"
+    tag_dist_relpath = f"{viz_subdir_name}/tag_count_distribution.png"
+    num_corr_relpath = f"{viz_subdir_name}/numerical_correlation.png"
+    num_tag_corr_relpath = f"{viz_subdir_name}/numerical_tag_correlation.png"
+
     readme_content = f"""# Data Analysis Report for Cleaned Codeforces Data
 
 Analysis performed on: `{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}`
@@ -153,13 +153,13 @@ Data source: `{os.path.basename(input_csv_path)}`
 
 This heatmap shows how often pairs of tags appear together in the dataset (raw counts).
 
-![Tag Co-occurrence Heatmap](tag_cooccurrence_heatmap.png)
+![Tag Co-occurrence Heatmap]({tag_heatmap_relpath})
 
 ### Distribution of Active Tags per Problem
 
 This plot shows the percentage of problems having a specific number of assigned tags.
 
-![Tag Count Distribution](tag_count_distribution.png)
+![Tag Count Distribution]({tag_dist_relpath})
 
 * Average number of tags per problem: `{stats['avg_tags_per_problem']:.2f}`
 
@@ -169,13 +169,13 @@ This plot shows the percentage of problems having a specific number of assigned 
 
 Correlation between `{', '.join(stats['numerical_columns'])}`.
 
-![Numerical Feature Correlation](numerical_correlation.png)
+![Numerical Feature Correlation]({num_corr_relpath})
 
 ### Correlation between Numerical Features and Tags
 
 Correlation between numerical features and the presence of specific tags. Note: Correlation with binary (0/1) tags indicates association strength.
 
-![Numerical vs Tag Correlation](numerical_tag_correlation.png)
+![Numerical vs Tag Correlation]({num_tag_corr_relpath})
 
 ## 4. Text Feature Analysis
 
@@ -188,23 +188,31 @@ Statistics for selected text columns:
     for col, data in stats['text_stats'].items():
         readme_content += f"| {col:<23} | {data['missing_perc']}%{' ':<13} | {data['avg_len']}{' ':<21} |\n"
 
-    readme_path = os.path.join(output_dir, "EDA_README.md")
+    # Write the README file
     with open(readme_path, "w", encoding="utf-8") as f:
         f.write(readme_content)
     print(f"README generated at {readme_path}")
 
 
+# --- Main Execution ---
+
 def main(args):
-    # --- Setup ---
+    # --- Setup Output Paths ---
     input_csv_path = args.csv_path
-    output_dir = args.output_dir
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # Define README path in the script's directory
+    readme_path = os.path.join(script_dir, "EDA_README.md")
+    # Define visualization subdirectory relative to the script's directory
+    viz_subdir_name = "visualizations" # Name of the subdirectory for plots
+    viz_dir = os.path.join(script_dir, viz_subdir_name)
 
-    # Create output directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
-    viz_dir = os.path.join(output_dir, "visualizations") # Subdir for plots
+    # Create visualization directory if it doesn't exist
     os.makedirs(viz_dir, exist_ok=True)
+    print(f"Outputting README to: {readme_path}")
+    print(f"Outputting visualizations to: {viz_dir}")
 
-
+    # --- Load Data ---
     print(f"Loading data from: {input_csv_path}")
     try:
         df = pd.read_csv(input_csv_path)
@@ -214,37 +222,32 @@ def main(args):
     except Exception as e:
         print(f"Error loading CSV: {e}")
         return
-
     print(f"Data loaded successfully with {len(df)} rows.")
 
-    # Filter DataFrame to only include SELECTED_COLUMNS + SELECTED_TAGS
+    # --- Prepare Data for Analysis ---
     cols_to_keep = list(set(SELECTED_COLUMNS + SELECTED_TAGS + OTHER_FEATURE_COLUMNS))
-    # Check which columns actually exist in the loaded dataframe
     existing_cols = [col for col in cols_to_keep if col in df.columns]
     missing_cols = [col for col in cols_to_keep if col not in df.columns]
     if missing_cols:
-        print(f"Warning: The following requested columns were not found in the CSV and will be skipped: {missing_cols}")
-
+        print(f"Warning: Skipping missing columns: {missing_cols}")
     df_analysis = df[existing_cols].copy()
 
-    # Ensure tag columns are numeric (0/1)
+    # Ensure tag columns are numeric
+    valid_tags = []
     for tag in SELECTED_TAGS:
         if tag in df_analysis.columns:
             df_analysis[tag] = pd.to_numeric(df_analysis[tag], errors='coerce').fillna(0).astype(int)
-        else:
-             print(f"Warning: Tag column '{tag}' not found. Skipping.")
+            valid_tags.append(tag)
+        else: print(f"Warning: Tag column '{tag}' not found.")
 
     # Ensure numerical columns are numeric
     valid_numerical_cols = []
     for col in OTHER_FEATURE_COLUMNS:
         if col in df_analysis.columns:
              df_analysis[col] = pd.to_numeric(df_analysis[col], errors='coerce')
-             # Keep track of numerical columns that are actually numeric after coercion
              if pd.api.types.is_numeric_dtype(df_analysis[col]):
                   valid_numerical_cols.append(col)
-        else:
-             print(f"Warning: Numerical column '{col}' not found. Skipping.")
-
+        else: print(f"Warning: Numerical column '{col}' not found.")
 
     # --- Perform Analyses ---
     stats = {}
@@ -252,38 +255,39 @@ def main(args):
     stats['analyzed_columns'] = existing_cols
     stats['numerical_columns'] = valid_numerical_cols
 
-    # Ignore warnings during plotting (e.g., from missing fonts)
-    with warnings.catch_warnings():
+    with warnings.catch_warnings(): # Ignore plotting warnings
         warnings.simplefilter("ignore")
 
-        # 1. Tag Heatmap
-        heatmap_path = os.path.join(viz_dir, "tag_cooccurrence_heatmap.png")
-        generate_tag_heatmap(df_analysis, [t for t in SELECTED_TAGS if t in df_analysis.columns], heatmap_path)
+        # 1. Tag Heatmap (Use full path for saving)
+        if valid_tags:
+             heatmap_path = os.path.join(viz_dir, "tag_cooccurrence_heatmap.png")
+             generate_tag_heatmap(df_analysis, valid_tags, heatmap_path)
+        else: print("Skipping tag heatmap: No valid tag columns found.")
 
-        # 2. Tag Distribution
-        dist_path = os.path.join(viz_dir, "tag_count_distribution.png")
-        stats['avg_tags_per_problem'] = plot_tag_distribution(df_analysis, [t for t in SELECTED_TAGS if t in df_analysis.columns], dist_path)
 
-        # 3. Numerical Correlation
-        if valid_numerical_cols:
+        # 2. Tag Distribution (Use full path for saving)
+        if valid_tags:
+             dist_path = os.path.join(viz_dir, "tag_count_distribution.png")
+             stats['avg_tags_per_problem'] = plot_tag_distribution(df_analysis, valid_tags, dist_path)
+        else:
+             stats['avg_tags_per_problem'] = 0
+             print("Skipping tag distribution: No valid tag columns found.")
+
+        # 3. Numerical Correlation (Use full path for saving)
+        if len(valid_numerical_cols) > 1: # Need at least 2 numerical cols for correlation
             num_corr_path = os.path.join(viz_dir, "numerical_correlation.png")
             generate_correlation_heatmap(df_analysis, valid_numerical_cols, "Numerical Feature Correlation", num_corr_path)
-        else:
-             print("Skipping numerical correlation heatmap as no valid numerical columns were found.")
+        else: print("Skipping numerical correlation: Less than 2 valid numerical columns found.")
 
-
-        # 4. Numerical vs Tag Correlation
-        num_tag_cols = valid_numerical_cols + [t for t in SELECTED_TAGS if t in df_analysis.columns]
-        if valid_numerical_cols and any(t in df_analysis.columns for t in SELECTED_TAGS):
+        # 4. Numerical vs Tag Correlation (Use full path for saving)
+        if valid_numerical_cols and valid_tags:
              num_tag_corr_path = os.path.join(viz_dir, "numerical_tag_correlation.png")
-             # Only show correlations between numerical and tags, not tags vs tags again
+             num_tag_cols = valid_numerical_cols + valid_tags
              temp_corr_df = df_analysis[num_tag_cols].corr()
-             # Select rows for numerical, columns for tags, and vice versa, then combine? Or just show full matrix?
-             # Let's show the relevant slice: Numerical rows, Tag columns
-             corr_slice = temp_corr_df.loc[valid_numerical_cols, [t for t in SELECTED_TAGS if t in df_analysis.columns]]
+             corr_slice = temp_corr_df.loc[valid_numerical_cols, valid_tags] # Slice relevant part
 
-             plt.figure(figsize=(12, max(6, len(valid_numerical_cols)*0.8))) # Adjust size
-             sns.heatmap(corr_slice, annot=True, cmap="coolwarm", fmt=".2f", linewidths=.5)
+             plt.figure(figsize=(max(8, len(valid_tags)*0.8), max(6, len(valid_numerical_cols)*0.8)))
+             sns.heatmap(corr_slice, annot=True, cmap="coolwarm", fmt=".2f", linewidths=.5, vmin=-1, vmax=1) # Set vmin/vmax
              plt.title("Correlation between Numerical Features and Tags")
              plt.xticks(rotation=45, ha='right')
              plt.yticks(rotation=0)
@@ -291,22 +295,18 @@ def main(args):
              plt.savefig(num_tag_corr_path)
              plt.close()
              print(f"Numerical vs Tag correlation heatmap saved to {num_tag_corr_path}")
-
-        else:
-             print("Skipping numerical vs tag correlation heatmap due to missing numerical or tag columns.")
-
+        else: print("Skipping numerical vs tag correlation: Missing valid numerical or tag columns.")
 
     # 5. Text Stats
-    stats['text_stats'] = calculate_text_stats(df_analysis, [col for col in TEXT_COLUMNS_FOR_ANALYSIS if col in df_analysis.columns])
+    valid_text_cols = [col for col in TEXT_COLUMNS_FOR_ANALYSIS if col in df_analysis.columns]
+    stats['text_stats'] = calculate_text_stats(df_analysis, valid_text_cols)
 
     # --- Generate README ---
-    # Note: README expects images in the same directory or a relative path
-    # We saved images to viz_dir, so README should reference them relative to output_dir
-    # Let's adjust the README generation to use relative paths from output_dir
-    generate_readme(stats, output_dir, input_csv_path) # Pass output_dir
+    # Pass the path for the README and the name of the viz subdirectory
+    generate_readme(stats, readme_path, viz_subdir_name, input_csv_path)
 
     print("\nEDA Report Generation Complete.")
-    print(f"Report saved in: {output_dir}")
+    print(f"Report saved in directory: {script_dir}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate EDA report and visualizations for the cleaned Codeforces dataset.")
@@ -316,17 +316,13 @@ if __name__ == "__main__":
         required=True,
         help="Path to the cleaned data CSV file."
     )
-    parser.add_argument(
-        "--output_dir",
-        type=str,
-        default="./eda_report",
-        help="Directory to save the generated README.md and visualization images."
-    )
+    # Removed --output_dir argument
+    # parser.add_argument(
+    #     "--output_dir", ...
+    # )
     args = parser.parse_args()
 
-    # Basic validation
     if not os.path.exists(args.csv_path):
          print(f"Error: Input CSV path does not exist: {args.csv_path}")
     else:
          main(args)
-
