@@ -65,6 +65,17 @@ CREATION_TIME_COLUMN = "creation_timestamp"
 
 TEST_SET_SIZE = 0.25
 
-TEXT_FEATURE_COLUMNS = ['problem_description', 'input_specification', 'output_specification', 'problem_notes']
+TEXT_FEATURE_COLUMNS = ['problem_description', 'problem_notes']
 OTHER_FEATURE_COLUMNS = ['time_limit', 'memory_limit', 'difficulty_rating']
 CODE_FEATURE_COLUMNS = ['solution_code']
+
+
+PROBLEM_ID_COLUMN = 'problem_id'
+
+
+FINE_TUNING_TEXT_COLUMN = "text" 
+
+GROUND_TRUTH_TAG_COLUMNS = SELECTED_TAGS
+
+PREDICTION_TAG_COLUMNS_PREFIX = "pred_"
+PREDICTION_TAG_COLUMNS = [f"{PREDICTION_TAG_COLUMNS_PREFIX}{tag}" for tag in SELECTED_TAGS]

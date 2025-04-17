@@ -122,9 +122,9 @@ def main():
     test_codeforces.to_csv(test_path, index=False)
     codeforces.to_csv(zero_shot_path, index=False)
     
-    print(f"Train data saved to: {train_path}")
-    print(f"Test data saved to: {test_path}")
-    print(f"Zero-shot data saved to: {zero_shot_path}")
+    print(f"Train data saved to: {train_path}", f"with {len(train_codeforces)} examples")
+    print(f"Test data saved to: {test_path}", f"with {len(test_codeforces)} examples")
+    print(f"Zero-shot data saved to: {zero_shot_path}", f"with {len(codeforces)} examples")
 
 if __name__ == "__main__":
     main()
